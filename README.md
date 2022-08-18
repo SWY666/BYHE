@@ -21,6 +21,8 @@ PyTorch implementation for BYHE.
     tqdm==4.62.3
     scikit-learn==1.0.1
     matplotlib==3.3.3
+    albumentations==1.2.0
+    Pillow==8.3.2
     ```
    
 2. Preprocess [VIPL-HR](http://vipl.ict.ac.cn/zygx/sjk/201811/t20181129_32716.html) datasets.
