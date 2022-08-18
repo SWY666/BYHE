@@ -30,7 +30,7 @@ from sklearn.metrics import mean_squared_error
 warnings.filterwarnings("ignore")
 
 def get_args_parser():
-    parser = argparse.ArgumentParser('WPPG Net', add_help=False)
+    parser = argparse.ArgumentParser('BYHE training', add_help=False)
     # Main params.
     parser.add_argument('--frame_path', default='X:/vipl-frame/frame_list', type=str,
                         help="""Please specify path to the 'frame_list' as input.""")
@@ -76,11 +76,11 @@ def train(args):
     start_time = time.strftime('%Y-%m-%d %H:%M:%S')
     print('Start training at', start_time, end='\n\n')
     if args.log_enable:
-        tb_writer = SummaryWriter(f'./tensorboard/tensorboard_offline_GPU{args.GPU_id}',
-                                  filename_suffix=f'_WPPGnet_offline_GPU{args.GPU_id}')
+        tb_writer = SummaryWriter(f'./tensorboard/BYHE_GPU{args.GPU_id}',
+                                  filename_suffix=f'_BYHE_GPU{args.GPU_id}')
         if not os.path.exists('./logs'):
             os.makedirs('./logs')
-        logging.basicConfig(filename=f'./logs/WPPGnet_offline_GPU{args.GPU_id}.log', filemode='w', level=logging.INFO,
+        logging.basicConfig(filename=f'./logs/BYHE_GPU{args.GPU_id}.log', filemode='w', level=logging.INFO,
                             format='%(levelname)s: %(message)s')
         logging.info('Start training at {}\n'.format(start_time))
 
@@ -165,7 +165,7 @@ def train(args):
     # ============ optionally resume training ... ============
     to_restore = {"epoch": 0}
     restart_from_checkpoint(
-        os.path.join(args.output_dir, f'WPPGnet_best_GPU{args.GPU_id}.pth'),
+        os.path.join(args.output_dir, f'BYHE_best_GPU{args.GPU_id}.pth'),
         run_variables=to_restore,
         model=model,
         optimizer=optimizer,
@@ -188,11 +188,11 @@ def train(args):
             'args': args
         }
         if epoch % args.saveckp_freq == 0 or epoch == args.epochs-1:
-            torch.save(save_dict, os.path.join(args.output_dir, f'WPPGnet_checkpoint{epoch:04}_GPU{args.GPU_id}.pth'))
+            torch.save(save_dict, os.path.join(args.output_dir, f'BYHE_checkpoint{epoch:04}_GPU{args.GPU_id}.pth'))
         # remember and save the best checkpoint.
         if avg_mae < best_mae:
             best_mae = min(avg_mae, best_mae)
-            torch.save(save_dict, os.path.join(args.output_dir, f'WPPGnet_best_GPU{args.GPU_id}.pth'))
+            torch.save(save_dict, os.path.join(args.output_dir, f'BYHE_best_GPU{args.GPU_id}.pth'))
 
     finish_time = time.strftime('%Y-%m-%d %H:%M:%S')
     print('Finish training at', finish_time)
@@ -225,7 +225,7 @@ def train_one_epoch(model, criterions, data_loader, optimizer, lr_schedule, wd_s
     model.train()
 
     end = time.time()
-    for it, (inputs, real_image_train, train_attn_label, skin_mask, wave_label, path, start_f, end_f) in enumerate(data_loader):
+    for it, (inputs, real_image_train, train_attn_label, skin_mask, wave_label, path, start_f, end_f, _) in enumerate(data_loader):
         # update weight decay and learning rate according to their schedule.
         train_iter = len(data_loader) * epoch + it  # global training iteration.
         for i, param_group in enumerate(optimizer.param_groups):
@@ -236,8 +236,7 @@ def train_one_epoch(model, criterions, data_loader, optimizer, lr_schedule, wd_s
         inputs = inputs.to(torch.device(args.GPU_id))
         real_image_train = real_image_train.to(torch.device(args.GPU_id))
 
-        # with torch.cuda.amp.autocast(fp16_scaler is not None):
-        attn_raw, output_mask2 = model(inputs, real_image_train)
+        attn_raw, output_mask2, _ = model(inputs, real_image_train)
 
         if args.log_enable and (epoch % 10 == 0 or epoch == args.epochs - 1):
             for b in range(attn_raw.shape[0]):  # batch size
@@ -251,23 +250,15 @@ def train_one_epoch(model, criterions, data_loader, optimizer, lr_schedule, wd_s
                     (train_attn_label[b] * 127.5 + 127.5).unsqueeze(dim=0).detach().cpu().numpy().astype(np.uint8), epoch)
 
         # loss calculate.
-        # attn_raw: attention matrix, aka 'R'
-        # wave_of_attn_raw: self similarity vector, aka 'Seq_R'
-        # wave_of_attn_raw = Turn_map_into_waves()(attn_raw)
-        # wave_of_attn_label = Turn_map_into_waves()(train_attn_label.to(torch.device(args.GPU_id)))
-
         loss_mapping = criterions[-1]
-        # loss_wave_Pearson = criterions[loss_mapping['loss_wave_Pearson']](wave_of_attn_raw, wave_of_attn_label)
-        # loss_wave_MSE = criterions[loss_mapping['loss_MSE']](wave_of_attn_raw, wave_of_attn_label)
-
         loss_atten = criterions[loss_mapping['loss_atten']](attn_raw, train_attn_label.to(torch.device(args.GPU_id)))
         loss_mse = criterions[loss_mapping['loss_MSE']](attn_raw, train_attn_label.to(torch.device(args.GPU_id)))
         loss_mask = criterions[loss_mapping['loss_mask']](output_mask2, skin_mask.to(torch.device(args.GPU_id)))
         loss_reg = criterions[loss_mapping['loss_reg']](attn_raw)
 
         total_loss = (
-            0.8 * loss_atten +  # 0.5
-            1.0 * loss_mse +  # 0.5
+            0.8 * loss_atten +
+            1.0 * loss_mse +
             0.2 * loss_mask +
             0.1 * loss_reg
         )
@@ -343,7 +334,7 @@ def validate(model, criterions, data_loader, epoch, logging, tb_writer, args):
             inputs = inputs.to(torch.device(args.GPU_id))
             real_image_test = real_image_test.to(torch.device(args.GPU_id))
 
-            attn_raw, output_mask2 = model(inputs, real_image_test)
+            attn_raw, output_mask2, _ = model(inputs, real_image_test)
 
             if args.log_enable and (epoch % 10 == 0 or epoch == args.epochs - 1):
                 for b in range(attn_raw.shape[0]):  # batch size
@@ -355,22 +346,16 @@ def validate(model, criterions, data_loader, epoch, logging, tb_writer, args):
                                         (test_attn_label[b] * 127.5 + 127.5).unsqueeze(dim=0).detach().cpu().numpy().astype(np.uint8), epoch)
 
             # loss calculate.
-            # attn_raw: attention matrix, aka 'R'
-            # wave_of_attn_raw: self similarity vector, aka 'Seq_R'
             wave_of_attn_raw = Turn_map_into_waves()(attn_raw)
-            # wave_of_attn_label = Turn_map_into_waves()(test_attn_label.to(torch.device(args.GPU_id)))
-
             loss_mapping = criterions[-1]
-            # loss_wave_Pearson = criterions[loss_mapping['loss_wave_Pearson']](wave_of_attn_raw, wave_of_attn_label)
-            # loss_wave_MSE = criterions[loss_mapping['loss_MSE']](wave_of_attn_raw, wave_of_attn_label)
             loss_atten = criterions[loss_mapping['loss_atten']](attn_raw, test_attn_label.to(torch.device(args.GPU_id)))
             loss_mse = criterions[loss_mapping['loss_MSE']](attn_raw, test_attn_label.to(torch.device(args.GPU_id)))
             loss_mask = criterions[loss_mapping['loss_mask']](output_mask2, skin_mask.to(torch.device(args.GPU_id)))
             loss_reg = criterions[loss_mapping['loss_reg']](attn_raw)
 
             total_loss = (
-                0.8 * loss_atten +  # 0.5
-                1.0 * loss_mse +  # 0.5
+                0.8 * loss_atten +
+                1.0 * loss_mse +
                 0.2 * loss_mask +
                 0.1 * loss_reg
             )
@@ -421,7 +406,7 @@ def validate(model, criterions, data_loader, epoch, logging, tb_writer, args):
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser('WPPG Net', parents=[get_args_parser()])
+    parser = argparse.ArgumentParser('BYHE training', parents=[get_args_parser()])
     args = parser.parse_args()
     Path(args.output_dir).mkdir(parents=True, exist_ok=True)
     train(args)

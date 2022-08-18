@@ -19,7 +19,6 @@ from utils.ippg_attn_make import self_similarity_calc
 detector = dlib.cnn_face_detection_model_v1('mmod_human_face_detector.dat')
 
 def the_only_face(frame_in, scale=3, maxlenth=40):
-    """人脸识别"""
     for i in range(len(frame_in)):
         rects = detector(frame_in[i], 0)
         lens = len(rects)
@@ -41,7 +40,6 @@ def the_only_face(frame_in, scale=3, maxlenth=40):
         if the_only_rect[0]:
             the_just_face_rect = the_only_rect[1]
             t0, b0, l0, r0 = the_just_face_rect.top(), the_just_face_rect.bottom(), the_just_face_rect.left(), the_just_face_rect.right()
-            # 将原有人脸框扩大至4/3
             maxh = (b0 - t0) / scale
             maxw = (r0 - l0) / scale
             finaladdh = max(maxh, maxlenth)

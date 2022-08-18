@@ -170,8 +170,9 @@ class Dataset_VIPL_HR_Offline(Dataset):
         wave_gt_return = wave_return_new[start:end]
         _wave_drop = wave_gt_return[self.frame_drop: -self.frame_drop]
         map_gt_return = self_similarity_calc(_wave_drop)
-
-        return residual_list_return, frame_list_return, map_gt_return, mask_list_return, wave_gt_return, self.frame_lists[idx], start, end
+        name = '_'.join([self.frame_lists[idx].split('_')[0], self.frame_lists[idx].split('_')[1], self.frame_lists[idx].split('_')[2],
+                         self.frame_lists[idx].split('_')[4], str(int(self.frame_lists[idx].split('_')[4]) + self.length)])
+        return residual_list_return, frame_list_return, map_gt_return, mask_list_return, wave_gt_return, self.frame_lists[idx], start, end, name
 
     def __len__(self):
         return len(self.frame_lists)

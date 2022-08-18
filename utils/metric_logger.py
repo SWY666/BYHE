@@ -1,7 +1,8 @@
-# -*- coding:utf-8 -*-
-# @File   : metric_logger.py
-# @Time   : 2022/5/17 11:21
-# @Author : Zhang Xinyu
+"""
+Mostly copy-paste from public repos like MoCo:
+https://github.com/facebookresearch/moco/blob/main/main_moco.py
+"""
+
 import logging
 
 class AverageMeter(object):
