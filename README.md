@@ -41,7 +41,7 @@ PyTorch implementation for BYHE.
 
 
 ## Training
-Default hyperparameter settings based on single GPU card "Tesla v100" with 16 Gb memory.
+Default hyperparameter settings based on single GPU card "Tesla v100" with 16 GB memory.
 ```bash
 python train.py
     --frame-path /path/to/frame_list
