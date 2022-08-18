@@ -31,7 +31,7 @@ PyTorch implementation for BYHE.
     ```bash
     python VIPL_preprocess.py
         --data-path /path/to/vipl-hr/
-        --infos-path './data/vipl-hr-infos'
+        --infos-path ./data/vipl-hr-infos
         --frame-path /path/to/save/frame_list
         --mask-path /path/to/save/mask_list
         --wave-path /path/to/save/wave_gt
@@ -52,7 +52,7 @@ python train.py
     --batch-size 6
     --epochs 50
     --log-enable True
-    --log-theme 'VIPL'
+    --log-theme VIPL
 ```
 
 
@@ -67,17 +67,17 @@ python test.py
     --num-workers 4
     --log-enable True
     --visual-enable True
-    --pretrained './pretrained/VIPL_f1.pth'
+    --pretrained ./pretrained/VIPL_f1.pth
 ```
 For quick testing:
 ```bash
 python test.py 
-    --frame-path './data/vipl-frame/frame_list' 
-    --mask-path './data/vipl-frame/mask_list' 
-    --wave_path './data/vipl-frame/wave_gt' 
+    --frame-path ./data/vipl-frame/frame_list
+    --mask-path ./data/vipl-frame/mask_list
+    --wave_path ./data/vipl-frame/wave_gt
     --GPU-id 0 
     --num-workers 4 
     --log-enable True 
     --visual-enable False 
-    --pretrained './pretrained/VIPL_f1.pth'
+    --pretrained ./pretrained/VIPL_f1.pth
 ```
