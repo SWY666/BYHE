@@ -36,9 +36,9 @@ def get_args_parser():
     parser.add_argument('--GPU-id', default=0, type=int, help="""Index of GPUs.""")
     parser.add_argument('--num-workers', default=0, type=int, help="""Number of data loading workers per GPU. (default: 
                         0)""")
-    parser.add_argument('--log-enable', default=True, type=bool, help="""Whether or not enable tensorboard and logging. 
+    parser.add_argument('--log-enable', default='True', type=str, help="""Whether or not enable tensorboard and logging. 
                        (Default: True).""")
-    parser.add_argument('--visual-enable', default=False, type=bool, help="""Whether or not enable plt visualization. 
+    parser.add_argument('--visual-enable', default='False', type=str, help="""Whether or not enable plt visualization. 
                        (Default: True).""")
     parser.add_argument('--pretrained', type=str, default='./pretrained/VIPL_f1.pth', help='pretrained weights path.')
     return parser
@@ -49,7 +49,7 @@ def test(args):
     start_time = time.strftime('%Y-%m-%d %H:%M:%S')
     print('Start testing at', start_time, end='\n\n')
 
-    if args.log_enable:
+    if args.log_enable=='True':
         root_logger = logging.getLogger()
         for h in root_logger.handlers[:]:
             root_logger.removeHandler(h)
@@ -75,7 +75,7 @@ def test(args):
     )
 
     print(f"Data loaded: there are {len(test_set)} videos for testing.")
-    if args.log_enable:
+    if args.log_enable=='True':
         logging.info(f"Data loaded: there are {len(test_set)} videos for testing.")
 
     # ============ building model ... ============
@@ -85,7 +85,7 @@ def test(args):
     print('Pretrained weights found at {}'.format(args.pretrained))
     print('load_state_dict msg: {}'.format(msg))
     print(f"saved epoch: {dict['epoch']}", end='\n\n')
-    if args.log_enable:
+    if args.log_enable=='True':
         logging.info('Pretrained weights found at {}'.format(args.pretrained))
         logging.info('load_state_dict msg: {}'.format(msg))
         logging.info(f"saved epoch: {dict['epoch']}\n")
@@ -130,10 +130,10 @@ def test(args):
             hr_MAE_total.append(hr_MAE)
 
             print(f'({cnt}/{len(test_set)})\t[{name[0]}]   \t Total Loss: {total_loss.item():.4f}\t||\tHR train: {hr_train:.4f}\t||\tHR label: {hr_label:.4f}\t||\tMAE bpm: {hr_MAE:.4f} ({np.mean(np.array(hr_MAE_total)):.4f})')
-            if args.log_enable:
+            if args.log_enable=='True':
                 logging.info(f'({cnt}/{len(test_set)})\t[{name[0]}]   \t Total Loss: {total_loss.item():.4f}\t||\tHR train: {hr_train:.4f}\t||\tHR label: {hr_label:.4f}\t||\tMAE bpm: {hr_MAE:.4f} ({np.mean(np.array(hr_MAE_total)):.4f})')
 
-            if args.visual_enable:
+            if args.visual_enable=='True':
                 plt.figure(figsize=(12,6))
                 plt.subplot(2, 2, 1)
                 plt.imshow(attn_raw[0].clone().detach().cpu().numpy())
@@ -160,7 +160,7 @@ def test(args):
 
     finish_time = time.strftime('%Y-%m-%d %H:%M:%S')
     print('Finish testing at', finish_time)
-    if args.log_enable:
+    if args.log_enable=='True':
         logging.info('Finish testing at {}\n'.format(finish_time))
 
 
