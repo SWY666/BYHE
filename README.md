@@ -74,7 +74,7 @@ For quick testing:
 python test.py 
     --frame-path ./data/vipl-frame/frame_list
     --mask-path ./data/vipl-frame/mask_list
-    --wave_path ./data/vipl-frame/wave_gt
+    --wave-path ./data/vipl-frame/wave_gt
     --GPU-id 0 
     --num-workers 4 
     --log-enable True 
