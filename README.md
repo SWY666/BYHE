@@ -2,5 +2,5 @@
 PyTorch implementation for BYHE.
 
 <div align="center">
-  <img width="100%" alt="DINO illustration" src=".github/BYHE.png">
+  <img width="100%" alt="BYHE illustration" src=".github/BYHE.png">
 </div>
