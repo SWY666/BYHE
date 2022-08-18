@@ -2,21 +2,42 @@
 # @File   : VIPL_preprocess.py
 # @Time   : 2022/5/17 16:39
 # @Author : Zhang Xinyu
-from torch.utils.data import Dataset
 import os
-import torch
+import warnings
 import cv2
 import numpy as np
 from scipy import signal
 import dlib
 import pandas as pd
 import tqdm
-
+import argparse
+from torch.utils.data import Dataset
 from libs.py37_win import tttt
+# from libs.py37_linux import tttt  # for linux.
 from utils.cwtbag import cwt_filtering
-from utils.ippg_attn_make import self_similarity_calc
 
+warnings.filterwarnings("ignore")
 detector = dlib.cnn_face_detection_model_v1('mmod_human_face_detector.dat')
+
+def get_args_parser():
+    parser = argparse.ArgumentParser('VIPL preprocessing', add_help=False)
+    # Main params.
+    parser.add_argument('--data-path', default='X:/vipl-hr', type=str,
+                        help="""Please specify path to the 'vipl-hr' as input.""")
+    parser.add_argument('--infos-path', default='./data/vipl-hr-infos', type=str,
+                        help="""Please specify path to the 'vipl-hr-infos' as input.""")
+
+    parser.add_argument('--frame-path', default='F:/vipl-frame/frame_list', type=str,
+                        help="""Please specify path to the 'frame_list' as output.""")
+    parser.add_argument('--mask-path', default='F:/vipl-frame/mask_list', type=str,
+                        help="""Please specify path to the 'mask_list' as output.""")
+    parser.add_argument('--wave-path', default='F:/vipl-frame/wave_gt', type=str,
+                        help="""Please specify path to the 'wave' as output.""")
+    parser.add_argument('--face-data-path', default='F:/vipl-face/data', type=str,
+                        help="""Please specify path to the 'face_data' as output.""")
+    parser.add_argument('--face-img-path', default='F:/vipl-face/img', type=str,
+                        help="""Please specify path to the 'face_img' as output.""")
+    return parser
 
 def the_only_face(frame_in, scale=3, maxlenth=40):
     for i in range(len(frame_in)):
@@ -26,7 +47,7 @@ def the_only_face(frame_in, scale=3, maxlenth=40):
             the_only_rect = (False, None)
         elif lens == 1:
             the_only_rect = (True, rects[0].rect)
-        else:  # 取离中心最近的
+        else:
             axis_x = int(frame_in[i].shape[0] / 2)
             axis_y = int(frame_in[i].shape[1] / 2)
             distances = [0.0 for x in range(lens)]
@@ -63,17 +84,18 @@ def filter(wave):
 
 
 class Dataset_vipl_hr_generate(Dataset):
-    def __init__(self, info_path, person_number, task_number, video_path, frame_drop=12, prefix=0, random_shake=True,
+    def __init__(self, args, person_number, task_number, frame_drop=12, prefix=0, random_shake=True,
                  cache_abandon=True):
         super().__init__()
+        self.args = args
         self.buffer = 10
         self.image_size = 131
         self.margin = 20
         # self.mask_size = 64
-        self.video_path = video_path
+        self.video_path = args.data_path
         self.task_number = task_number
         self.info_pool = []
-        self.collect_info(info_path, person_number)
+        self.collect_info(args.infos_path, person_number)
         self.frame_drop = frame_drop
         self.video_check()
         self.wave_check()
@@ -94,8 +116,7 @@ class Dataset_vipl_hr_generate(Dataset):
 
         with open(txt_path, "r") as f:
             info_str = f.readline()
-            # 'ground truth hr' in .txt is not used.
-            start_place, end_place, _ = info_str.split("_")[0], info_str.split("_")[1], info_str.split("_")[2]
+            start_place, end_place, hr = info_str.split("_")[0], info_str.split("_")[1], info_str.split("_")[2]
             start_place, end_place = int(start_place), int(end_place)
             start_place, end_place = start_place + self.buffer, end_place - self.buffer
 
@@ -104,21 +125,21 @@ class Dataset_vipl_hr_generate(Dataset):
                                                                    person_number, task_number, i)
             wave_return_new = self.read_wave_csv(wave_path, start_place, end_place, start_place, end_place)
 
-            save_path = os.path.join('X:/vipl-frame-v8v9/frame_list', '_'.join([i, person_number, task_number, 's2',
+            save_path = os.path.join(self.args.frame_path, '_'.join([i, person_number, task_number, 's2',
                                                                            str(start_place),
-                                                                           str(end_place)]) + '.npy')
+                                                                           str(end_place), hr]) + '_.npy')
             frame_list_save = np.array(frame_list)
             np.save(save_path, frame_list_save)
 
-            save_path = os.path.join('X:/vipl-frame-v8v9/mask_list', '_'.join([i, person_number, task_number, 's2',
+            save_path = os.path.join(self.args.mask_path, '_'.join([i, person_number, task_number, 's2',
                                                                           str(start_place),
-                                                                          str(end_place)]) + '.npy')
+                                                                          str(end_place), hr]) + '_.npy')
             mask_list_save = np.array(mask_list)
             np.save(save_path, mask_list_save)
 
-            save_path = os.path.join('X:/vipl-frame-v8v9/wave_gt', '_'.join([i, person_number, task_number, 's2',
+            save_path = os.path.join(self.args.wave_path, '_'.join([i, person_number, task_number, 's2',
                                                                         str(start_place),
-                                                                        str(end_place)]) + '.npy')
+                                                                        str(end_place), hr]) + '_.npy')
             wave_return_new_save = wave_return_new
             np.save(save_path, wave_return_new_save)
             self.prefix += 1
@@ -161,8 +182,6 @@ class Dataset_vipl_hr_generate(Dataset):
         for index in del_list:
             print('video invalid, del: {}'.format(self.info_pool[index]))
             self.info_pool.pop(index)
-
-
     def wave_check(self):
         del_list = []
         for index in range(len(self.info_pool)-1, -1, -1):
@@ -240,14 +259,14 @@ class Dataset_vipl_hr_generate(Dataset):
             shape_of_frame = frame_list[0].shape
             tf, bf, lf, rf = self.random_shake_frame(tf, bf, lf, rf, shape_of_frame)
 
-        save_path = os.path.join('X:/vipl-face-v8v9/data', '_'.join([i, person_number, task_number, 's2',
+        save_path = os.path.join(self.args.face_data_path, '_'.join([i, person_number, task_number, 's2',
                                                                 str(start_place_this_time),
                                                                 str(end_place_this_time)]) + '.npy')
         np.save(save_path, [tf, bf, lf, rf])
 
         img = frame_list[0].copy()
         cv2.rectangle(img, (lf, tf), (rf, bf), (0, 0, 255), 3)
-        save_path = os.path.join('X:/vipl-face-v8v9/img', '_'.join([i, person_number, task_number, 's2',
+        save_path = os.path.join(self.args.face_img_path, '_'.join([i, person_number, task_number, 's2',
                                                                str(start_place_this_time),
                                                                str(end_place_this_time)]) + '.png')
         cv2.imwrite(save_path, img)
@@ -293,10 +312,8 @@ class Dataset_vipl_hr_generate(Dataset):
         rf = min(rf, rm)
         return tf, bf, lf, rf
 
-    @staticmethod
-    def del_cache():
-        paths = ['X:/vipl-face-v8v9/data', 'X:/vipl-face-v8v9/img', 'X:/vipl-frame-v8v9/frame_list', 'X:/vipl-frame-v8v9/mask_list',
-                 'X:/vipl-frame-v8v9/wave_gt']
+    def del_cache(self):
+        paths = [self.args.face_data_path, self.args.face_img_path, self.args.frame_path, self.args.mask_path, self.args.wave_path]
         for path in paths:
             if not os.path.exists(path):
                 os.makedirs(path)
@@ -307,11 +324,12 @@ class Dataset_vipl_hr_generate(Dataset):
 
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser('VIPL preprcessing', parents=[get_args_parser()])
+    args = parser.parse_args()
     total_set = set(list(range(108)))
-    version_type = [rf"v{i}" for i in range(8, 10)]
+    version_type = [rf"v{i}" for i in range(1, 10)]
     person_name = [rf"p{i}" for i in total_set]
-    datasets = Dataset_vipl_hr_generate('X:/vipl-hr-infos-v8v9', person_name, version_type, 'X:/vipl-hr', prefix=730,
-                                        random_shake=True, cache_abandon=True)
+    datasets = Dataset_vipl_hr_generate(args, person_name, version_type, prefix=0, random_shake=True, cache_abandon=True)
     for i in tqdm.tqdm(range(len(datasets))):
         datasets.__getitem__(i)
 

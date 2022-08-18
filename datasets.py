@@ -41,19 +41,19 @@ class Dataset_VIPL_HR_Offline(Dataset):
         mask_list_path = os.path.join(self.mask_list_root_path, self.mask_lists[idx])
         wave_gt_path = os.path.join(self.wave_gt_root_path, self.wave_gts[idx])
 
-        frame_list_origin = np.load(frame_list_path)  # (frame_length, 151, 151, 3)
-        mask_list_origin = np.load(mask_list_path)  # (frame_length-1, 151, 151)
-        wave_return_new = np.load(wave_gt_path)  # (frame_length,)
+        frame_list_origin = np.load(frame_list_path)
+        mask_list_origin = np.load(mask_list_path)
+        wave_return_new = np.load(wave_gt_path)
 
-        frame_list_tf = np.zeros([frame_list_origin.shape[0], 131, 131, 3], dtype=np.uint8)  # (frame_length, 131, 131, 3)
-        mask_list_tf = np.zeros([mask_list_origin.shape[0], 131, 131], dtype=np.uint8)  # (frame_length-1, 131, 131)
+        frame_list_tf = np.zeros([frame_list_origin.shape[0], 131, 131, 3], dtype=np.uint8)
+        mask_list_tf = np.zeros([mask_list_origin.shape[0], 131, 131], dtype=np.uint8)
 
         ## Data Augmentation, only for training.
         if self.is_train:
             # 1.random crop.
             dh, dw = self.random_shake_frame(margin=20)
-            frame_list_origin = frame_list_origin[:, dh:131 + dh, dw:131 + dw, :]  # (frame_length, 131, 131, 3)
-            mask_list_origin = mask_list_origin[:, dh:131 + dh, dw:131 + dw]  # (frame_length-1, 131, 131)
+            frame_list_origin = frame_list_origin[:, dh:131 + dh, dw:131 + dw, :]
+            mask_list_origin = mask_list_origin[:, dh:131 + dh, dw:131 + dw]
 
             # 2.random flip.
             is_hFlip = np.random.random() > 0.5
@@ -62,7 +62,7 @@ class Dataset_VIPL_HR_Offline(Dataset):
                 A.VerticalFlip(p=is_hFlip),
                 A.HorizontalFlip(p=is_vFlip)
             ])
-            for i in range(frame_list_origin.shape[0]):  # frame_list_origin: 70, mask_list_origin: 69
+            for i in range(frame_list_origin.shape[0]):
                 if i == frame_list_origin.shape[0] - 1:
                     frame_list_tf[i] = transform(image=frame_list_origin[i])['image']
                 else:
@@ -142,8 +142,8 @@ class Dataset_VIPL_HR_Offline(Dataset):
 
         else:
             # center crop for validation.
-            frame_list_tf = frame_list_origin[:, 10:141, 10:141, :]  # (frame_length, 131, 131, 3)
-            mask_list_tf = mask_list_origin[:, 10:141, 10:141]  # (frame_length-1, 131, 131)
+            frame_list_tf = frame_list_origin[:, 10:141, 10:141, :]
+            mask_list_tf = mask_list_origin[:, 10:141, 10:141]
 
         mask_list = np.zeros([mask_list_tf.shape[0], 64, 64], dtype=np.uint8)
         residual_list = np.zeros([frame_list_tf.shape[0] - 1, frame_list_tf.shape[1], frame_list_tf.shape[2], frame_list_tf.shape[3]], dtype=np.int16)
@@ -238,7 +238,7 @@ if __name__ == "__main__":
     test_set = set(list(range(0, 22)))
     train_set = total_set - test_set
     person_name = [rf"p{i}" for i in train_set]
-    version_type = [rf"v{i}" for i in range(1, 8)]
+    version_type = [rf"v{i}" for i in range(1, 10)]
 
     dataset = Dataset_VIPL_HR_Offline(frame_list_root_path, person_name, version_type, mask_list_root_path,
                                       wave_gt_root_path)
