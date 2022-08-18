@@ -3,11 +3,9 @@ from utils.cwtbag import cwt_filtering
 from scipy import signal
 import dlib
 
-#####################################
 image_size = 131
 black_size = 64
 dif = 12
-# 选择ippg版本
 
 def peakcheckez(a, samplingrate):
     result = []

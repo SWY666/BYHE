@@ -51,7 +51,6 @@ def self_similarity_calc(ippg):
     for i in range(len(ippg_phase)):
         tmp_list = []
         for j in range(len(ippg_phase)):
-            # 相关度（可以直接用cos来代替）
             similarity = np.cos(ippg_phase[i] - ippg_phase[j])
             tmp_list.append(similarity)
         tmp_list = torch.FloatTensor(tmp_list).unsqueeze(-1)

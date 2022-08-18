@@ -1,7 +1,6 @@
 import torch
 from torch import nn
 
-# 用于计算2维的fft
 class FFT_MODULE(nn.Module):
     def __init__(self):
         super().__init__()
@@ -20,7 +19,6 @@ class FFT_MODULE(nn.Module):
         return result
 
 
-# 用于计算1维的fft
 class FFT_MODULE_1d(nn.Module):
     def __init__(self, GPU_id, use_cuda=True):
         super().__init__()
@@ -41,9 +39,7 @@ class FFT_MODULE_1d(nn.Module):
         return final_result
 
 
-# 这个函数的输入是一维的，不带batch维度的等待fft的序列。
 class Reg_version_1(nn.Module):
-    #这个正则化的方法的核心是，理论上每一点和另外一点的关系，只和距离有关。所以他们之间的值应当很接近。
     def __init__(self):
         super().__init__()
 
@@ -72,19 +68,13 @@ class Reg_version_1(nn.Module):
             # result.append(torch.cat(distance_record[i], 0))
             # print(len(distance_record[i]))
             result.append(torch.std(torch.cat(distance_record[i], 0) * len(distance_record[i])/5).unsqueeze(0))
-            #计算每个距离集合的std,通常来说，std越小，代表这一层级越发稳定。这个len(distance_record[i])表示如果
-            #聚类里面的成员越多，这个std的权重就越大。除以5是防止这个数太大导致loss很大。
         # for i in range(len(result)):
         #     print(len(result[i]))
         # print(result)
         amassed = torch.mean(torch.cat(result, 0))
         return amassed
 
-
-# 第二个正则化，每一斜行的均值组成的波形应该尽量逼近正弦函数。
-# 所以这个类的目的是将一张图根据斜行的均值化为一个类似于正弦函数的波形。
 class Turn_map_into_waves(nn.Module):
-    # 第二个正则化，每一斜行的均值组成的波形应该尽量逼近正弦函数。
     def __init__(self):
         super().__init__()
 
@@ -105,12 +95,11 @@ class Turn_map_into_waves(nn.Module):
 
         result = []
         for i in range(len(distance_record)):
-            result.append(torch.mean(torch.cat(distance_record[i], 0)).unsqueeze(0)) #计算均值！let's see!
+            result.append(torch.mean(torch.cat(distance_record[i], 0)).unsqueeze(0))
         amassed = torch.cat(result, 0)
         return amassed
 
 
-# 对于生成的波形的正则化（输入是attn的batch，输出一个wave的标准）
 class Reg_version_wave(nn.Module):
     def __init__(self, Gpu_ID):
         super().__init__()
@@ -133,7 +122,6 @@ class Reg_version_wave(nn.Module):
         wave_altered = self.fft_module_turner.solo_fft_1d_make(input)
         lens = wave_altered.shape[0]
         select_space = (1, 1 + int(lens/2))
-        #选择一个最大的坐标。
         max_index = torch.argmax(wave_altered[select_space[0]:select_space[1]], 0) + select_space[0]
         judgement = 1 - (wave_altered[max_index] / torch.sum(wave_altered[select_space[0]:select_space[1]]))
         return judgement

@@ -73,6 +73,7 @@ class LARS(torch.optim.Optimizer):
 def restart_from_checkpoint(ckp_path, run_variables=None, **kwargs):
     """
     Re-start from checkpoint
+    Almost copy-paste from https://github.com/facebookresearch/dino/blob/main/utils.py
     """
     if not os.path.isfile(ckp_path):
         return
