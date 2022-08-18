@@ -30,13 +30,13 @@ PyTorch implementation for BYHE.
 
     ```bash
     python VIPL_preprocess.py
-        --data_path /path/to/vipl-hr/
-        --infos_path './data/vipl-hr-infos'
-        --frame_path /path/to/save/frame_list
-        --mask_path /path/to/save/mask_list
-        --wave_path /path/to/save/wave_gt
-        --face_data_path /path/to/save/face_data
-        --face_img_path /path/to/save/face_img    
+        --data-path /path/to/vipl-hr/
+        --infos-path './data/vipl-hr-infos'
+        --frame-path /path/to/save/frame_list
+        --mask-path /path/to/save/mask_list
+        --wave-path /path/to/save/wave_gt
+        --face-data-path /path/to/save/face_data
+        --face-img-path /path/to/save/face_img    
     ```
 
 
@@ -44,15 +44,15 @@ PyTorch implementation for BYHE.
 Default hyperparameter settings based on single GPU card "Tesla v100" with 16 Gb memory.
 ```bash
 python train.py
-    --frame_path /path/to/frame_list
-    --mask_path /path/to/mask_list
-    --wave_path /path/to/wave_gt
-    --GPU_id 0
-    --num_workers 4
-    --batch_size 6
+    --frame-path /path/to/frame_list
+    --mask-path /path/to/mask_list
+    --wave-path /path/to/wave_gt
+    --GPU-id 0
+    --num-workers 4
+    --batch-size 6
     --epochs 50
-    --log_enable True
-    --log_theme 'VIPL'
+    --log-enable True
+    --log-theme 'VIPL'
 ```
 
 
@@ -60,24 +60,24 @@ python train.py
 pre-trained weights can be found at `./pretrained`.
 ```bash
 python test.py
-    --frame_path /path/to/frame_list
-    --mask_path /path/to/mask_list
-    --wave_path /path/to/wave_gt
-    --GPU_id 0
-    --num_workers 4
-    --log_enable True
-    --visual_enable True
+    --frame-path /path/to/frame_list
+    --mask-path /path/to/mask_list
+    --wave-path /path/to/wave_gt
+    --GPU-id 0
+    --num-workers 4
+    --log-enable True
+    --visual-enable True
     --pretrained './pretrained/VIPL_f1.pth'
 ```
 For quick testing:
 ```bash
-python test.py
-    --frame_path './data/vipl-frame/frame_list'
-    --mask_path './data/vipl-frame/mask_list'
-    --wave_path './data/vipl-frame/wave_gt'
-    --GPU_id 0
-    --num_workers 4
-    --log_enable True
-    --visual_enable False
+python test.py 
+    --frame-path './data/vipl-frame/frame_list' 
+    --mask-path './data/vipl-frame/mask_list' 
+    --wave_path './data/vipl-frame/wave_gt' 
+    --GPU-id 0 
+    --num-workers 4 
+    --log-enable True 
+    --visual-enable False 
     --pretrained './pretrained/VIPL_f1.pth'
 ```

@@ -24,17 +24,17 @@ warnings.filterwarnings("ignore")
 def get_args_parser():
     parser = argparse.ArgumentParser('BYHE testing', add_help=False)
     # Main params.
-    parser.add_argument('--frame_path', default='./data/vipl-frame/frame_list', type=str,
+    parser.add_argument('--frame-path', default='./data/vipl-frame/frame_list', type=str,
                         help="""Please specify path to the 'frame_list' as input.""")
-    parser.add_argument('--mask_path', default='./data/vipl-frame/mask_list', type=str,
+    parser.add_argument('--mask-path', default='./data/vipl-frame/mask_list', type=str,
                         help="""Please specify path to the 'mask_list' as GT.""")
-    parser.add_argument('--wave_path', default='./data/vipl-frame/wave_gt', type=str,
+    parser.add_argument('--wave-path', default='./data/vipl-frame/wave_gt', type=str,
                         help="""Please specify path to the 'wave' as GT.""")
     parser.add_argument('--length', default=70, type=int, help="""Length for video frames training.""")
     parser.add_argument('--test-length', default=300, type=int, help="""Length for video frames testing (HR Calculate).""")
     parser.add_argument('--win-length', default=11, type=int, help="""Sliding window length. (default: 11)""")
     parser.add_argument('--GPU-id', default=0, type=int, help="""Index of GPUs.""")
-    parser.add_argument('--num_workers', default=0, type=int, help="""Number of data loading workers per GPU. (default: 
+    parser.add_argument('--num-workers', default=0, type=int, help="""Number of data loading workers per GPU. (default: 
                         0)""")
     parser.add_argument('--log-enable', default=True, type=bool, help="""Whether or not enable tensorboard and logging. 
                        (Default: True).""")
