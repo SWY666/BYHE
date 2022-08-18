@@ -63,7 +63,7 @@ def get_args_parser():
     parser.add_argument('--weight-decay-end', default=1e-3, type=float, help="""Final value of the weight decay. We use a 
                         cosine schedule for WD and using a larger decay by the end of training improves performance for 
                         ViTs. (default: 1e-3)""")
-    parser.add_argument('--log-enable', default=True, type=bool, help="""Whether or not enable tensorboard and logging. 
+    parser.add_argument('--log-enable', default='True', type=str, help="""Whether or not enable tensorboard and logging. 
                        (Default: True).""")
     parser.add_argument('--print-freq', default=1, type=int, help="""Print metrics every x iterations.""")
     parser.add_argument('--log-theme', default='VIPL', type=str, help="""Annotation for tensorboard.""")
@@ -75,7 +75,7 @@ def train(args):
     # ============ Setup logging ... ============
     start_time = time.strftime('%Y-%m-%d %H:%M:%S')
     print('Start training at', start_time, end='\n\n')
-    if args.log_enable:
+    if args.log_enable=='True':
         tb_writer = SummaryWriter(f'./tensorboard/BYHE_GPU{args.GPU_id}',
                                   filename_suffix=f'_BYHE_GPU{args.GPU_id}')
         if not os.path.exists('./logs'):
@@ -238,7 +238,7 @@ def train_one_epoch(model, criterions, data_loader, optimizer, lr_schedule, wd_s
 
         attn_raw, output_mask2, _ = model(inputs, real_image_train)
 
-        if args.log_enable and (epoch % 10 == 0 or epoch == args.epochs - 1):
+        if args.log_enable=='True' and (epoch % 10 == 0 or epoch == args.epochs - 1):
             for b in range(attn_raw.shape[0]):  # batch size
                 tb_writer.add_image(
                     '_'.join(['train-output', path[b].split('_')[0], path[b].split('_')[1], path[b].split('_')[2],
@@ -291,7 +291,7 @@ def train_one_epoch(model, criterions, data_loader, optimizer, lr_schedule, wd_s
     print('Train Avg: Total Loss: {total_loss.avg:.4f}'.format(total_loss=total_loss_metric))
 
     # ============ writing logs ... ============
-    if args.log_enable:
+    if args.log_enable=='True':
         logging.info('Train Avg: Total Loss: {total_loss.avg:.4f}'.format(total_loss=total_loss_metric))
         tb_writer.add_scalars('train_loss', {'total_loss': total_loss_metric.avg,
                                              'map_pearson_loss': loss_atten_metric.avg,
@@ -336,7 +336,7 @@ def validate(model, criterions, data_loader, epoch, logging, tb_writer, args):
 
             attn_raw, output_mask2, _ = model(inputs, real_image_test)
 
-            if args.log_enable and (epoch % 10 == 0 or epoch == args.epochs - 1):
+            if args.log_enable=='True' and (epoch % 10 == 0 or epoch == args.epochs - 1):
                 for b in range(attn_raw.shape[0]):  # batch size
                     tb_writer.add_image('_'.join(['val-output', path[b].split('_')[0], path[b].split('_')[1], path[b].split('_')[2],
                                                   str(start_f[b].item()), str(end_f[b].item())]),
@@ -389,7 +389,7 @@ def validate(model, criterions, data_loader, epoch, logging, tb_writer, args):
               total_loss=total_loss_metric,
               MAE_bpm=MAE_bpm_metric,
               RMSE_bpm=RMSE_bpm), end='\n\n')
-    if args.log_enable:
+    if args.log_enable=='True':
         logging.info('Test Avg: Total Loss: {total_loss.avg:.4f}  MAE bpm: {MAE_bpm.avg:.4f}  RMSE bpm: {RMSE_bpm:.4f}\n'.format(
             total_loss=total_loss_metric,
             MAE_bpm=MAE_bpm_metric,

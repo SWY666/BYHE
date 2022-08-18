@@ -41,7 +41,7 @@ class ProgressMeter(object):
         entries += [str(meter) for meter in self.meters]
         a = '\t'.join(entries)
         print('\t'.join(entries))
-        if self.log_enable:
+        if self.log_enable=='True':
             logging.info('\t'.join(entries))  # log writing.
 
     def _get_batch_fmtstr(self, num_batches):
