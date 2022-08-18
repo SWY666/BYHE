@@ -1,4 +1,4 @@
-# BYHE:A Simple Framework for Boosting End-to-end Video-based Heart Rate Measurement Network
+# BYHE: A Simple Framework for Boosting End-to-end Video-based Heart Rate Measurement Network
 PyTorch implementation for BYHE.
 
 <div align="center">
