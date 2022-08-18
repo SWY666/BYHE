@@ -23,7 +23,6 @@ class Mask_loss(nn.Module):
         self.loss_fn = nn.MSELoss()
 
     def forward(self, masks, real_masks):
-        #二者的输入都是(B, T, H, W)
         loss_list = []
         for i in range(masks.shape[0]):
             loss_list.append(self.loss_fn(masks[i], real_masks[i]).unsqueeze(0))
@@ -66,7 +65,6 @@ class N_Pearson_Correlation(nn.Module):
         return result
 
 
-# attn图像的loss
 class ATTN_LOSS(nn.Module):
     def __init__(self):
         super().__init__()

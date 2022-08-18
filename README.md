@@ -57,7 +57,7 @@ python train.py
 
 
 ## Evaluation
-pre-trained weights can be found at `./pretrained`.
+Pre-trained weights can be found at `./pretrained`.Test with your own data:
 ```bash
 python test.py
     --frame-path /path/to/frame_list

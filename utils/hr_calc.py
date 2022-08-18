@@ -23,7 +23,6 @@ def peakcheckez(a, samplingrate):
         for i in range(len(result) - 1):
             hr = 60 * samplingrate / (result[i + 1] - result[i])
             hr_list.append(hr)
-        # print("大招", hr_list)
         hr = np.mean(np.array(hr_list))
     return hr
 

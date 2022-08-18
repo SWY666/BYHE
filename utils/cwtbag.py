@@ -4,7 +4,6 @@ import math
 import pycwt
 
 def maxscale(array1):
-    """取矩阵每行最大值"""
     list1 = []
     for i in range(array1.shape[0]):
         list1.append(np.mean(array1[i]))
@@ -12,7 +11,6 @@ def maxscale(array1):
 
 
 def rowcal(array1, row1):
-    """矩阵每列与高斯窗相乘"""
     array2 = np.zeros(array1.shape)
     for i in range(array1.shape[1]):
         array2[:,i] = array1[:, i] * row1
@@ -46,25 +44,23 @@ frequencies = [3.75, 3.720703125, 3.69140625, 3.662109375, 3.6328125, 3.60351562
 
 
 def cwt_filtering(listin, samplingrate, frequencies=frequencies):
-    sr = samplingrate  # 30
-    plf1 = np.array(listin)  # (255, )
-    result = pycwt.cwt(plf1, 1 / sr, freqs=np.array(frequencies))  # 小波基: morlet
-    # result: 6 * (126, 255)
-    cwtmatr = result[0]  # (126, 255)
+    sr = samplingrate
+    plf1 = np.array(listin)
+    result = pycwt.cwt(plf1, 1 / sr, freqs=np.array(frequencies))
+    cwtmatr = result[0]
     # import matplotlib.pyplot as plt
     # plt.figure()
     # plt.imshow(abs(result[0]))
     # plt.show()
-    scale1 = maxscale(abs(result[0]))  # (126, )
-    co = np.argmax(scale1)  # 92
+    scale1 = maxscale(abs(result[0]))
+    co = np.argmax(scale1)
     myguasswindow = np.array([0.0 for x in range(len(scale1))])
     for j in range(len(scale1)):
         myguasswindow[j] = math.exp(-0.3 * ((j - co) / (0.08 * len(scale1))) ** 2)
-    # myguasswindow: (126, )
-    mycwtmatr = rowcal(abs(result[0]), myguasswindow)  # (126, 255)
-    mycwtmatr2 = rowcal(result[0].real, myguasswindow)  # (126, 255)
-    result_copy = result[1][:]  # (126, )
-    result3 = pycwt.icwt(mycwtmatr2, result_copy, 1 / sr).real  # (255, )
+    mycwtmatr = rowcal(abs(result[0]), myguasswindow)
+    mycwtmatr2 = rowcal(result[0].real, myguasswindow)
+    result_copy = result[1][:]
+    result3 = pycwt.icwt(mycwtmatr2, result_copy, 1 / sr).real
     return result3, mycwtmatr, cwtmatr
 
 
@@ -72,7 +68,6 @@ def cwt_show(listin, sr):
     result = pycwt.cwt(listin, 1 / sr, freqs=np.array(frequencies))
     cwtmatr = abs(result[0])
     return cwtmatr
-
 
 
 if __name__ == "__main__":
