@@ -38,7 +38,7 @@ def get_args_parser():
                         0)""")
     parser.add_argument('--log-enable', default='True', type=str, help="""Whether or not enable tensorboard and logging. 
                        (Default: True).""")
-    parser.add_argument('--visual-enable', default='False', type=str, help="""Whether or not enable plt visualization. 
+    parser.add_argument('--visual-enable', default='True', type=str, help="""Whether or not enable plt visualization. 
                        (Default: True).""")
     parser.add_argument('--pretrained', type=str, default='./pretrained/VIPL_f1.pth', help='pretrained weights path.')
     return parser
@@ -124,7 +124,7 @@ def test(args):
             )
 
             hr_train, altered_wave = hr_cal(wave_of_attn_raw.detach().cpu().numpy().tolist()[0])
-            wave_label_per_sample = wave_label[0]
+            wave_label_per_sample = wave_label[0].numpy()
             hr_label = peakcheckez(wave_label_per_sample, 30)
             hr_MAE = abs(hr_train - hr_label)
             hr_MAE_total.append(hr_MAE)

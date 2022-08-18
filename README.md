@@ -78,6 +78,6 @@ python test.py
     --GPU-id 0 
     --num-workers 4 
     --log-enable True 
-    --visual-enable 
+    --visual-enable False
     --pretrained ./pretrained/VIPL_f1.pth
 ```
