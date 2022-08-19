@@ -28,7 +28,10 @@ def fft2d(attn):
     attns = rearrange(attn, "b n t1 t2 -> (b n) t1 t2").unsqueeze(-1)
     imag_part = torch.zeros(attns.shape)
     complex = torch.cat([attns, imag_part], dim=-1)
-    result = torch.fft(complex, 2)
+    try:
+        result = torch.fft(complex, 2)
+    except:
+        result = torch.fft.fft(complex, 2)
     result_list = torch.split(result, 1, dim=-1)
     result = torch.sqrt(torch.square(result_list[0]) + torch.square(result_list[1])).squeeze()
     result = rearrange(result, "(b n) t1 t2 -> b n t1 t2", n=8)

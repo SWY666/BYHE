@@ -12,7 +12,10 @@ class FFT_MODULE(nn.Module):
         for i in range(len(batch_list)):
             attn_zeros = torch.zeros(batch_list[i].shape[1:]).unsqueeze(-1).cuda()
             attn_real_and_image = torch.cat([batch_list[i].squeeze().unsqueeze(-1), attn_zeros], -1)
-            result = torch.fft(attn_real_and_image, 2)
+            try:
+                result = torch.fft(attn_real_and_image, 2)
+            except:
+                result = torch.fft.fft(attn_real_and_image, 2)
             final_result = torch.norm(result, p=2, dim=2).unsqueeze(0)
             result_list.append(final_result)
 
