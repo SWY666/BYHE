@@ -1,3 +1,4 @@
+# Copyright ©2022 Sun weiyu and Chen ying. All Rights Reserved.
 from torch.utils.data import DataLoader, Dataset
 import os
 import torch

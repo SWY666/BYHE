@@ -1,3 +1,4 @@
+# Copyright ©2022 Sun weiyu and Chen ying. All Rights Reserved.
 import numpy as np
 from utils.cwtbag import cwt_filtering
 from scipy import signal

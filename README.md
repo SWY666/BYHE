@@ -24,7 +24,9 @@ PyTorch implementation for BYHE.
     albumentations==1.2.0
     Pillow==8.3.2
     ```
-   
+   **Note:** It is recommended to use python 3.7, different versions will not be able to use the libraries we provide, 
+   details in `./libs`.If so, contact us!
+
 2. Preprocess [VIPL-HR](http://vipl.ict.ac.cn/zygx/sjk/201811/t20181129_32716.html) datasets.
    **"vipl-hr-infos"** can be found at `./data`.
 
@@ -38,6 +40,8 @@ PyTorch implementation for BYHE.
         --face-data-path /path/to/save/face_data
         --face-img-path /path/to/save/face_img    
     ```
+   **Note:** If you don't need to pre-process the entire datasets, try modifying the `version_type`、`person_name` in 
+   `VIPL_preprocess.py`.
 
 
 ## Training

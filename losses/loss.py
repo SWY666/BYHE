@@ -1,3 +1,4 @@
+# Copyright ©2022 Sun weiyu and Chen ying. All Rights Reserved.
 import torch
 import torch.nn as nn
 import torch.nn.functional as F

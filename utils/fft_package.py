@@ -1,3 +1,4 @@
+# Copyright ©2022 Sun weiyu and Chen ying. All Rights Reserved.
 import torch
 from torch import nn
 
