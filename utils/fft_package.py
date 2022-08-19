@@ -38,7 +38,10 @@ class FFT_MODULE_1d(nn.Module):
         else:
             attn_zeros = torch.zeros(input.shape).unsqueeze(-1)
         attn_real_and_image = torch.cat([input.squeeze().unsqueeze(-1), attn_zeros], -1)
-        result = torch.fft(attn_real_and_image, 1)
+        try:
+            result = torch.fft(attn_real_and_image, 1)
+        except:
+            result = torch.fft.fft(attn_real_and_image, 1)
         final_result = torch.norm(result, p=2, dim=1)
         return final_result
 
