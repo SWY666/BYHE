@@ -330,7 +330,7 @@ def validate(model, criterions, data_loader, epoch, logging, tb_writer, args):
     with torch.no_grad():
         hr_train_bpm = []
         hr_label_bpm = []
-        for it, (inputs, real_image_test, test_attn_label, skin_mask, wave_label, path, start_f, end_f) in enumerate(data_loader):
+        for it, (inputs, real_image_test, test_attn_label, skin_mask, wave_label, path, start_f, end_f, _) in enumerate(data_loader):
             inputs = inputs.to(torch.device(args.GPU_id))
             real_image_test = real_image_test.to(torch.device(args.GPU_id))
 
