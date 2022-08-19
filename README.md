@@ -41,7 +41,7 @@ PyTorch implementation for BYHE.
         --face-img-path /path/to/save/face_img    
     ```
    **Note:** If you don't need to pre-process the entire datasets, try modifying the `version_type`、`person_name` in 
-   `VIPL_preprocess.py`.
+   [VIPL_preprocess.py](VIPL_preprocess.py).
 
 
 ## Training
@@ -58,10 +58,13 @@ python train.py
     --log-enable True
     --log-theme VIPL
 ```
+**Note:** Default training **fold 1**, try modifying the `test_set` in [train.py](train.py).
 
 
 ## Evaluation
-Pre-trained weights can be found at `./pretrained`.Test with your own data:
+Pre-trained weights can be found at `./pretrained`.
+
+Test with your own data:
 ```bash
 python test.py
     --frame-path /path/to/frame_list
@@ -73,6 +76,8 @@ python test.py
     --visual-enable True
     --pretrained ./pretrained/VIPL_f1.pth
 ```
+**Note:** Default testing **fold 1**, try modifying the `test_set` in [test.py](test.py).
+
 For quick testing:
 ```bash
 python test.py 
