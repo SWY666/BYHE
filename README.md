@@ -31,14 +31,14 @@ PyTorch implementation for BYHE.
    **"vipl-hr-infos"** can be found at `./data`.
 
     ```bash
-    python VIPL_preprocess.py
-        --data-path /path/to/vipl-hr/
-        --infos-path ./data/vipl-hr-infos
-        --frame-path /path/to/save/frame_list
-        --mask-path /path/to/save/mask_list
-        --wave-path /path/to/save/wave_gt
-        --face-data-path /path/to/save/face_data
-        --face-img-path /path/to/save/face_img    
+    python VIPL_preprocess.py 
+        --data-path /path/to/vipl-hr/ 
+        --infos-path ./data/vipl-hr-infos 
+        --frame-path /path/to/save/frame_list 
+        --mask-path /path/to/save/mask_list 
+        --wave-path /path/to/save/wave_gt 
+        --face-data-path /path/to/save/face_data 
+        --face-img-path /path/to/save/face_img
     ```
    **Note:** If you don't need to pre-process the entire datasets, try modifying the `version_type`、`person_name` in 
    [VIPL_preprocess.py](VIPL_preprocess.py).
@@ -47,15 +47,15 @@ PyTorch implementation for BYHE.
 ## Training
 Default hyperparameter settings based on single GPU card "Tesla v100" with 16 GB memory.
 ```bash
-python train.py
-    --frame-path /path/to/frame_list
-    --mask-path /path/to/mask_list
-    --wave-path /path/to/wave_gt
-    --GPU-id 0
-    --num-workers 4
-    --batch-size 6
-    --epochs 50
-    --log-enable True
+python train.py 
+    --frame-path /path/to/frame_list 
+    --mask-path /path/to/mask_list 
+    --wave-path /path/to/wave_gt 
+    --GPU-id 0 
+    --num-workers 4 
+    --batch-size 6 
+    --epochs 50 
+    --log-enable True 
     --log-theme VIPL
 ```
 **Note:** Default training **fold 1**, try modifying the `test_set` in [train.py](train.py).
@@ -66,14 +66,14 @@ Pre-trained weights can be found at `./pretrained`.
 
 Test with your own data:
 ```bash
-python test.py
-    --frame-path /path/to/frame_list
-    --mask-path /path/to/mask_list
-    --wave-path /path/to/wave_gt
-    --GPU-id 0
-    --num-workers 4
-    --log-enable True
-    --visual-enable True
+python test.py 
+    --frame-path /path/to/frame_list 
+    --mask-path /path/to/mask_list 
+    --wave-path /path/to/wave_gt 
+    --GPU-id 0 
+    --num-workers 4 
+    --log-enable True 
+    --visual-enable True 
     --pretrained ./pretrained/VIPL_f1.pth
 ```
 **Note:** Default testing **fold 1**, try modifying the `test_set` in [test.py](test.py).
@@ -81,13 +81,13 @@ python test.py
 For quick testing:
 ```bash
 python test.py 
-    --frame-path ./data/vipl-frame/frame_list
-    --mask-path ./data/vipl-frame/mask_list
-    --wave-path ./data/vipl-frame/wave_gt
+    --frame-path ./data/vipl-frame/frame_list 
+    --mask-path ./data/vipl-frame/mask_list 
+    --wave-path ./data/vipl-frame/wave_gt 
     --GPU-id 0 
     --num-workers 4 
     --log-enable True 
-    --visual-enable False
+    --visual-enable False 
     --pretrained ./pretrained/VIPL_f1.pth
 ```
 
